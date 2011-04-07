@@ -9,3 +9,5 @@ native
 target
 thirdparty
 logs
+.classpath
+.project
