@@ -5,8 +5,25 @@ or use Avro files as input of Hadoop Streaming.
 
 ## Avro I/O in Map/Reduce Jobs
 
-* See src/test/java/com/tomslabs.grid.avro/AvroWordCount.java for an example of Job setup.
-* Avro Schema for the output data MUST be specified when setting up the Job
+### Avro input
+
+Use `com.tomslabs.grid.avro.AvroFileInputFormat` to use Avro files as the *input* of Map/Reduce jobs.  
+
+'map()' will be called with a key of type Avro's `GenericRecord` and a `NullWritable` value.
+
+### Avro Ouput
+
+Use `com.tomslabs.grid.avro.AvroFileOuputFormat` to use Avro files as the *output* of Map/Reduce jobs.  
+
+In `reduce()` method, the context must emit with a key of type Avro's `GenericRecord` and  a `NullWritable` value.
+Please note that the _Avro Schema for the output data MUST be specified when setting up the Job_.
+ 
+### Example 
+
+`src/test/java/com/tomslabs/grid/avro/AvroWordCount.java` is an example showing how to use Avro files for both input and output of a Map/Reduce jobs.
+
+This example can be run as unit test from `AvroWordCountTest.java`.
+
 
 ## Avro Input for Hadoop Streaming
 
