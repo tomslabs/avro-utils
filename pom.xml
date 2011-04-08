@@ -6,6 +6,34 @@
   <version>1.5.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Avro Utils</name>
+  <description>Utilities to use Avro files from Hadoop Map/Reduce jobs and Streaming</description>
+  <url>https://github.com/tomslabs/avro-utils</url>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>git@github.com:tomslabs/avro-utils.git</url>
+    <developerConnection>scm:git:git@github.com:tomslabs/avro-utils.git</developerConnection>
+    <connection>scm:git:git@github.com:tomslabs/avro-utils.git</connection>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <developers>
+    <developer>
+      <id>jmesnil</id>
+      <name>Jeff Mesnil.</name>
+      <email>jmesnil@bestofmedia.com</email>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
@@ -37,6 +65,30 @@
           <target>1.5</target>
         </configuration>
       </plugin>
-    </plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+          <id>attach-javadocs</id>
+          <goals>
+            <goal>jar</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
   </build>    
 </project>
