@@ -55,8 +55,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
     }
 
     public boolean next(Text key, Text value) throws IOException {
-        if (!reader.hasNext() || reader.pastSync(end))
+        if (!reader.hasNext() || reader.pastSync(end)) {
             return false;
+        }
         StringBuilder buf = new StringBuilder();
         toString(reader.next(), buf);
         key.set(buf.toString());
@@ -92,8 +93,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
                 toString(f.name(), buffer);
                 buffer.append(": ");
                 toString(record.get(f.pos()), buffer);
-                if (++count < record.getSchema().getFields().size())
+                if (++count < record.getSchema().getFields().size()) {
                     buffer.append(", ");
+                }
             }
             buffer.append("}");
         } else if (datum instanceof Collection) {
@@ -103,8 +105,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
             int i = 0;
             for (Object element : array) {
                 toString(element, buffer);
-                if (i++ < last)
+                if (i++ < last) {
                     buffer.append(", ");
+                }
             }
             buffer.append("]");
         } else if (datum instanceof Map) {
@@ -116,8 +119,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
                 toString(entry.getKey(), buffer);
                 buffer.append(": ");
                 toString(entry.getValue(), buffer);
-                if (++count < map.size())
+                if (++count < map.size()) {
                     buffer.append(", ");
+                }
             }
             buffer.append("}");
         } else if (datum instanceof CharSequence) {
@@ -127,8 +131,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
         } else if (datum instanceof ByteBuffer) {
             buffer.append("{\"bytes\": \"");
             ByteBuffer bytes = (ByteBuffer) datum;
-            for (int i = bytes.position(); i < bytes.limit(); i++)
+            for (int i = bytes.position(); i < bytes.limit(); i++) {
                 buffer.append((char) bytes.get(i));
+            }
             buffer.append("\"}");
         } else {
             buffer.append(datum);
@@ -169,8 +174,9 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
                 if ((ch >= '\u0000' && ch <= '\u001F') || (ch >= '\u007F' && ch <= '\u009F') || (ch >= '\u2000' && ch <= '\u20FF')) {
                     String hex = Integer.toHexString(ch);
                     builder.append("\\u");
-                    for (int j = 0; j < 4 - builder.length(); j++)
+                    for (int j = 0; j < 4 - builder.length(); j++) {
                         builder.append('0');
+                    }
                     builder.append(string.toUpperCase());
                 } else {
                     builder.append(ch);

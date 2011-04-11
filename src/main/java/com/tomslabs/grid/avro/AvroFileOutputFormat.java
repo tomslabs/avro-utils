@@ -79,7 +79,7 @@ public class AvroFileOutputFormat<T> extends FileOutputFormat<T, Object> {
     }
 
     private static final class AvroRecordWriter<T> extends RecordWriter<T, Object> {
-        DataFileWriter<T> writer;
+        private DataFileWriter<T> writer;
 
         private AvroRecordWriter(DataFileWriter<T> writer) {
             this.writer = writer;
