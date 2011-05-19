@@ -56,7 +56,10 @@ public class AvroWordCount {
             fields.add(new Field("word", Schema.create(Schema.Type.STRING), "", null));
             schema.setFields(fields);
             return schema;
-
+        }
+        
+        public static void main(String[] args) {
+            System.out.println(getSchema());
         }
     }
     
