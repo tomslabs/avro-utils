@@ -15,7 +15,6 @@ package com.tomslabs.grid.avro;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 import junit.framework.Assert;
 

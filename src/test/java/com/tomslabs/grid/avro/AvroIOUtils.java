@@ -15,28 +15,21 @@ package com.tomslabs.grid.avro;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericData.Record;
 
 public class AvroIOUtils {
 
     public static String createAvroInputFile(File inputDir, String... words) throws Throwable {
         File tempFile = new File(inputDir + File.separator + "word-count.avro");
-        AvroWordCount.WordCountSchema.getOuputSchema();
+        Schema schema = AvroWordCount.WordInputSchema.getSchema();
         DataFileWriter<GenericRecord> writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter<GenericRecord>());
-        Schema schema = Schema.createRecord("word", "", "", false);
-        List<Field> fields = new ArrayList<Field>();
-        fields.add(new Field("word", Schema.create(Schema.Type.STRING), "", null));
-        schema.setFields(fields);
         writer.create(schema, tempFile);
         for (String word : words) {
             AvroIOUtils.addRecord("word", word, writer, schema);

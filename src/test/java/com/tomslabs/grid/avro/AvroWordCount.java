@@ -14,8 +14,11 @@
 package com.tomslabs.grid.avro;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericData.Record;
@@ -38,13 +41,25 @@ public class AvroWordCount {
         public static final String KEY = "key";
         public static final String VALUE = "value";
 
-        public static Schema getOuputSchema() {
+        public static Schema getSchema() {
             Schema schema = Pair.getPairSchema(Schema.create(Type.STRING), Schema.create(Type.INT));
             return schema;
 
         }
     }
 
+    public static class WordInputSchema {
+
+        public static Schema getSchema() {
+            Schema schema = Schema.createRecord("word", "", "", false);
+            List<Field> fields = new ArrayList<Field>();
+            fields.add(new Field("word", Schema.create(Schema.Type.STRING), "", null));
+            schema.setFields(fields);
+            return schema;
+
+        }
+    }
+    
     public static class WordCountMapper extends Mapper<GenericRecord, NullWritable, Text, IntWritable> {
 
         private static final IntWritable ONE = new IntWritable(1);
@@ -73,7 +88,7 @@ public class AvroWordCount {
 
     public static Job createSubmitableJob(final Configuration conf, final Path inputPath, final Path outputPath) throws IOException {
 
-        conf.set(AvroFileOutputFormat.OUTPUT_SCHEMA, WordCountSchema.getOuputSchema().toString());
+        conf.set(AvroFileOutputFormat.OUTPUT_SCHEMA, WordCountSchema.getSchema().toString());
 
         conf.setInt("mapred.max.split.size", 1024000);
         conf.setInt("mapred.reduce.tasks", 10);
