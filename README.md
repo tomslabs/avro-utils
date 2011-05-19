@@ -46,7 +46,7 @@ For example, to count the number of expression, something like:
         -input /tmp/word-count.avro \
         -output /tmp/out \
         -mapper /bin/cat \
-        -reducer usr/bin/wc
+        -reducer /usr/bin/wc
 
 The format of each line streamed through Avro looks like:
 
