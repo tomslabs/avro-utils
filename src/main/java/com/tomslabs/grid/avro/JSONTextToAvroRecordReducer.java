@@ -23,22 +23,25 @@ public class JSONTextToAvroRecordReducer implements Reducer<Text, Text, AvroWrap
 
     
     private JobConf job;
+    private Schema schema;
     
     public void configure(JobConf job) {
         this.job = job;
+        this.schema = Schema.parse(job.get(AvroJob.OUTPUT_SCHEMA));
     }
 
     public void close() throws IOException {
     }
 
     public void reduce(Text key, Iterator<Text> values, OutputCollector<AvroWrapper<GenericRecord>, NullWritable> output, Reporter reporter) throws IOException {
-        Schema schema = Schema.parse(job.get(AvroJob.OUTPUT_SCHEMA));
-        GenericRecord record = new Record(schema);
-
-        DatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(schema);
-        Decoder decoder = new JsonDecoder(schema, key.toString());
-        record = reader.read(null, decoder);
+        GenericRecord record = from(key.toString(), schema);
         AvroWrapper<GenericRecord> wrapper = new AvroWrapper<GenericRecord>(record);
         output.collect(wrapper, NullWritable.get());
+    }
+
+    protected GenericRecord from(String jsonString, Schema schema) throws IOException {
+        DatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(schema);
+        Decoder decoder = new JsonDecoder(schema, jsonString);
+        return reader.read(null, decoder);
     }
 }
