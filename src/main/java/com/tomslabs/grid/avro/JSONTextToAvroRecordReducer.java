@@ -9,6 +9,7 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.JsonDecoder;
 import org.apache.avro.mapred.AvroJob;
 import org.apache.avro.mapred.AvroWrapper;
@@ -41,7 +42,7 @@ public class JSONTextToAvroRecordReducer implements Reducer<Text, Text, AvroWrap
 
     protected GenericRecord from(String jsonString, Schema schema) throws IOException {
         DatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(schema);
-        Decoder decoder = new JsonDecoder(schema, jsonString);
+        Decoder decoder = DecoderFactory.get().jsonDecoder(schema, jsonString);
         return reader.read(null, decoder);
     }
 }
