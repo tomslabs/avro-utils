@@ -21,14 +21,15 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.mapred.FsInput;
 import org.apache.hadoop.io.DataOutputBuffer;
-import org.apache.hadoop.io.WritableUtils;
+import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.typedbytes.TypedBytesOutput;
 import org.apache.hadoop.typedbytes.TypedBytesWritable;
 
-public class TypedBytesAvroTextFileInputFormat extends org.apache.hadoop.mapred.FileInputFormat {
+public class AvroAsTextTypedBytesInputFormat extends FileInputFormat<TypedBytesWritable, TypedBytesWritable> {
 
     @Override
     public org.apache.hadoop.mapred.RecordReader<TypedBytesWritable, TypedBytesWritable> getRecordReader(org.apache.hadoop.mapred.InputSplit split,
@@ -57,7 +58,7 @@ public class TypedBytesAvroTextFileInputFormat extends org.apache.hadoop.mapred.
             this.start = reader.tell();
             this.end = split.getStart() + split.getLength();
         }
-
+        
         public TypedBytesWritable createKey() {
             return new TypedBytesWritable();
         }
@@ -65,18 +66,17 @@ public class TypedBytesAvroTextFileInputFormat extends org.apache.hadoop.mapred.
         public TypedBytesWritable createValue() {
             return new TypedBytesWritable();
         }
-
+        
         public boolean next(TypedBytesWritable key, TypedBytesWritable value) throws IOException {
             if (!reader.hasNext() || reader.pastSync(end)) {
                 return false;
             }
+
             StringBuilder buf = new StringBuilder();
             JSONUtils.writeJSON(reader.next(), buf);
-            DataOutputBuffer out = new DataOutputBuffer();
-            WritableUtils.writeString(out, buf.toString());
-            out.flush();
-            byte[] data = out.getData();
-            key.set(data, 0, data.length);
+
+            key.setValue("");
+            value.setValue(buf.toString());
             return true;
         }
 
