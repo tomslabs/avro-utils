@@ -14,15 +14,10 @@
 package com.tomslabs.grid.avro;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Map;
 
-import org.apache.avro.Schema.Field;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.FileReader;
 import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.FsInput;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileSplit;
@@ -59,7 +54,7 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
             return false;
         }
         StringBuilder buf = new StringBuilder();
-        toString(reader.next(), buf);
+        JSONUtils.writeJSON(reader.next(), buf);
         key.set(buf.toString());
         return true;
     }
@@ -78,110 +73,5 @@ public class AvroTextRecordReader<T> implements RecordReader<Text, Text> {
 
     public void close() throws IOException {
         reader.close();
-    }
-
-    /**
-     * Patch from https://issues.apache.org/jira/browse/AVRO-713 until we switch
-     * to Avro 1.5.0
-     */
-    protected static void toString(Object datum, StringBuilder buffer) {
-        if (datum instanceof IndexedRecord) {
-            buffer.append("{");
-            int count = 0;
-            IndexedRecord record = (IndexedRecord) datum;
-            for (Field f : record.getSchema().getFields()) {
-                toString(f.name(), buffer);
-                buffer.append(": ");
-                toString(record.get(f.pos()), buffer);
-                if (++count < record.getSchema().getFields().size()) {
-                    buffer.append(", ");
-                }
-            }
-            buffer.append("}");
-        } else if (datum instanceof Collection) {
-            Collection<?> array = (Collection<?>) datum;
-            buffer.append("[");
-            long last = array.size() - 1;
-            int i = 0;
-            for (Object element : array) {
-                toString(element, buffer);
-                if (i++ < last) {
-                    buffer.append(", ");
-                }
-            }
-            buffer.append("]");
-        } else if (datum instanceof Map) {
-            buffer.append("{");
-            int count = 0;
-            @SuppressWarnings(value = "unchecked")
-            Map<Object, Object> map = (Map<Object, Object>) datum;
-            for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                toString(entry.getKey(), buffer);
-                buffer.append(": ");
-                toString(entry.getValue(), buffer);
-                if (++count < map.size()) {
-                    buffer.append(", ");
-                }
-            }
-            buffer.append("}");
-        } else if (datum instanceof CharSequence) {
-            buffer.append("\"");
-            writeEscapedString(datum.toString(), buffer);
-            buffer.append("\"");
-        } else if (datum instanceof ByteBuffer) {
-            buffer.append("{\"bytes\": \"");
-            ByteBuffer bytes = (ByteBuffer) datum;
-            for (int i = bytes.position(); i < bytes.limit(); i++) {
-                buffer.append((char) bytes.get(i));
-            }
-            buffer.append("\"}");
-        } else {
-            buffer.append(datum);
-        }
-    }
-
-    /* Adapted from http://code.google.com/p/json-simple */
-    protected static void writeEscapedString(String string, StringBuilder builder) {
-        for (int i = 0; i < string.length(); i++) {
-            char ch = string.charAt(i);
-            switch (ch) {
-            case '"':
-                builder.append("\\\"");
-                break;
-            case '\\':
-                builder.append("\\\\");
-                break;
-            case '\b':
-                builder.append("\\b");
-                break;
-            case '\f':
-                builder.append("\\f");
-                break;
-            case '\n':
-                builder.append("\\n");
-                break;
-            case '\r':
-                builder.append("\\r");
-                break;
-            case '\t':
-                builder.append("\\t");
-                break;
-            case '/':
-                builder.append("\\/");
-                break;
-            default:
-                // Reference: http://www.unicode.org/versions/Unicode5.1.0/
-                if ((ch >= '\u0000' && ch <= '\u001F') || (ch >= '\u007F' && ch <= '\u009F') || (ch >= '\u2000' && ch <= '\u20FF')) {
-                    String hex = Integer.toHexString(ch);
-                    builder.append("\\u");
-                    for (int j = 0; j < 4 - builder.length(); j++) {
-                        builder.append('0');
-                    }
-                    builder.append(string.toUpperCase());
-                } else {
-                    builder.append(ch);
-                }
-            }
-        }
     }
 }
