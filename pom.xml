@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tomslabs</groupId>
   <artifactId>avro-utils</artifactId>
-  <version>1.5.2</version>
+  <version>1.5.3</version>
   <packaging>jar</packaging>
   <name>Avro Utils</name>
   <description>Utilities to use Avro files from Hadoop Map/Reduce jobs and Streaming</description>
@@ -38,15 +38,25 @@
   <dependencies>
     <dependency>
       <groupId>com.cloudera.hadoop</groupId>
-       <artifactId>hadoop-core</artifactId>
-       <version>0.20.2-737</version>
+      <artifactId>hadoop-core</artifactId>
+      <version>0.20.2-737</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudera.hadoop</groupId>
+      <artifactId>hadoop-streaming</artifactId>
+      <version>0.20.2-737</version>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
-      <version>1.4.1</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
+       <groupId>org.apache.avro</groupId>
+       <artifactId>avro-mapred</artifactId>
+       <version>1.5.1</version>
+     </dependency>
+     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
@@ -90,5 +100,13 @@
       </executions>
     </plugin>
   </plugins>
-  </build>    
+  </build>  
+  
+  <repositories>
+    <repository>
+      <id>cloudera</id>
+      <name>libs-releases</name>
+      <url>https://repository.cloudera.com/content/repositories/releases/</url>
+    </repository>
+  </repositories>  
 </project>

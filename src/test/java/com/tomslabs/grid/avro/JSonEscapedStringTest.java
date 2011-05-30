@@ -24,7 +24,7 @@ public class JSonEscapedStringTest {
         String escapedString =  "my monitor has a  24\\\" size";
 
         StringBuilder buf = new StringBuilder();
-        AvroTextRecordReader.writeEscapedString(value, buf);
+        JSONUtils.writeEscapedString(value, buf);
         Assert.assertEquals(escapedString, buf.toString());
     }
 }
