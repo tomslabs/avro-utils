@@ -27,4 +27,13 @@ public class JSonEscapedStringTest {
         JSONUtils.writeEscapedString(value, buf);
         Assert.assertEquals(escapedString, buf.toString());
     }
+
+    @Test
+    public void testGenerateValidEscapedUnicode() {
+        String value = "\u2013";
+
+        StringBuilder buf = new StringBuilder();
+        JSONUtils.writeEscapedString(value, buf);
+        Assert.assertEquals("\\u2013", buf.toString());
+    }
 }
