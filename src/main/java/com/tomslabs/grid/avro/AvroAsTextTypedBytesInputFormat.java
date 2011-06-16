@@ -14,32 +14,40 @@
 package com.tomslabs.grid.avro;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.FileReader;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.mapred.AvroOutputFormat;
 import org.apache.avro.mapred.FsInput;
-import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.typedbytes.TypedBytesOutput;
 import org.apache.hadoop.typedbytes.TypedBytesWritable;
 
 public class AvroAsTextTypedBytesInputFormat extends FileInputFormat<TypedBytesWritable, TypedBytesWritable> {
 
     @Override
-    public org.apache.hadoop.mapred.RecordReader<TypedBytesWritable, TypedBytesWritable> getRecordReader(org.apache.hadoop.mapred.InputSplit split,
-            JobConf job, Reporter reporter) {
-        try {
-            return new AvroTypedBytesRecordReader<GenericRecord>(job, (FileSplit) split);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+    protected FileStatus[] listStatus(JobConf job) throws IOException {
+      List<FileStatus> result = new ArrayList<FileStatus>();
+      for (FileStatus file : super.listStatus(job))
+        if (file.getPath().getName().endsWith(AvroOutputFormat.EXT))
+          result.add(file);
+      return result.toArray(new FileStatus[0]);
+    }
+
+    @Override
+    public RecordReader<TypedBytesWritable, TypedBytesWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter)
+      throws IOException {
+      reporter.setStatus(split.toString());
+      return new AvroTypedBytesRecordReader<GenericRecord>(job, (FileSplit) split);
     }
 
     static class AvroTypedBytesRecordReader<T> implements RecordReader<TypedBytesWritable, TypedBytesWritable> {
@@ -72,11 +80,8 @@ public class AvroAsTextTypedBytesInputFormat extends FileInputFormat<TypedBytesW
                 return false;
             }
 
-            StringBuilder buf = new StringBuilder();
-            JSONUtils.writeJSON(reader.next(), buf);
-
             key.setValue("");
-            value.setValue(buf.toString());
+            value.setValue(reader.next().toString());
             return true;
         }
 
