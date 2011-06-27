@@ -81,7 +81,12 @@ public class AvroAsTextTypedBytesInputFormat extends FileInputFormat<TypedBytesW
             }
 
             key.setValue("");
-            value.setValue(reader.next().toString());
+            // until https://github.com/apache/avro/pull/2/ is fixed, we can not rely
+            // on toString() to provide a correct JSON string with unicode.
+            //value.setValue(reader.next().toString());
+            StringBuilder buf = new StringBuilder();
+            JSONUtils.writeJSON(reader.next(), buf);
+            value.setValue(buf.toString());
             return true;
         }
 
