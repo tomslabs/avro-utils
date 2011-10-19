@@ -37,14 +37,16 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.cloudera.hadoop</groupId>
+      <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-core</artifactId>
-      <version>0.20.2-737</version>
+      <version>0.20.2-cdh3u1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.cloudera.hadoop</groupId>
+      <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-streaming</artifactId>
-      <version>0.20.2-737</version>
+      <version>0.20.2-cdh3u1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
