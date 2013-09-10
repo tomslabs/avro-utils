@@ -15,6 +15,7 @@ package com.tomslabs.grid.avro;
 
 import java.io.IOException;
 
+import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.Schema;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
@@ -28,9 +29,13 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AvroFileOutputFormat<T> extends FileOutputFormat<T, Object> {
 
+   private static final Logger LOGGER = LoggerFactory.getLogger(AvroFileOutputFormat.class);
+   
     /**
      * When the map/reduce job outputs Avro record, the String representation of
      * the Avro schema <em>MUST</em> be set on the job's configuration with this key.
@@ -87,7 +92,13 @@ public class AvroFileOutputFormat<T> extends FileOutputFormat<T, Object> {
 
         @Override
         public void close(TaskAttemptContext arg0) throws IOException, InterruptedException {
-            writer.close();
+            try {
+               LOGGER.warn("Closing the avro resource");
+                writer.close();
+            } catch (AvroRuntimeException e) {
+                LOGGER.warn("Trying to close a closed avro resource", e);
+                arg0.progress();
+            }
         }
 
         @Override

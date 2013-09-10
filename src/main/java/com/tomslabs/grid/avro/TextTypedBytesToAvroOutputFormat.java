@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.Schema;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
@@ -38,10 +39,13 @@ import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.typedbytes.TypedBytesWritable;
 import org.apache.hadoop.util.Progressable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** An {@link org.apache.hadoop.mapred.OutputFormat} for Avro data files. */
 public class TextTypedBytesToAvroOutputFormat extends FileOutputFormat<TypedBytesWritable, TypedBytesWritable> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextTypedBytesToAvroOutputFormat.class);
 
     /** The file name extension for avro data files. */
     public final static String EXT = ".avro";
@@ -104,7 +108,13 @@ public class TextTypedBytesToAvroOutputFormat extends FileOutputFormat<TypedByte
         }
 
         public void close(Reporter reporter) throws IOException {
-            writer.close();
+            try {
+                LOGGER.warn("Closing the avro resource");
+                 writer.close();
+             } catch (AvroRuntimeException e) {
+                 LOGGER.warn("Trying to close a closed avro resource", e);
+                 reporter.progress();
+             }
         }
     }
 
